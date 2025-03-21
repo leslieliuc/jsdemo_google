@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <head> 
+  <head>
     <title>視覺判斷實驗</title>
-    <script src="https://unpkg.com/jspsych@8.2.1"></script> 
+    <script src="https://unpkg.com/jspsych@8.2.1"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.1.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@2.1.0"></script>
     <link href="https://unpkg.com/jspsych@8.2.1/css/jspsych.css" rel="stylesheet" type="text/css" />
@@ -19,7 +19,7 @@
   <script>
     var jsPsych = initJsPsych({
       on_finish: function() {
-        var lastData = jsPsych.data.get().last(1).values()[0];  
+        var lastData = jsPsych.data.get().last(1).values()[0];
         var allData = jsPsych.data.get().trials.map(trial => ({
           subject_code: trial.subject_code || "unknown",
           name: trial.name || "unknown",
@@ -44,52 +44,45 @@
           accuracy: accuracy.toFixed(2) + "%"
         });
 
-        var url = "https://script.google.com/macros/s/AKfycbzrHFa4Fu0e5TlfcMrwAJnWvcYbJoyrivRnNR-qrBcZ3d1vt1qQysdnchcyUxiWeALN/exec";
-        
-        // Use fetch() to upload the data to Google Sheets
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(allData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          console.log("Data successfully uploaded:", data);
-        })
-        .catch(error => {
-          console.error("Error uploading data:", error);
-        });
+        // Send data to Google Apps Script
+        var url = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";  // Replace with your Google Apps Script Web App URL
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.send(JSON.stringify(allData));
       }
     });
-    
+
     var timeline = [];
 
-    // 同意書步驟
+    // Consent form step
     timeline.push({
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: '<div style="text-align: justify;">' +
-                '<p>感謝你參加本次實驗，以下是實驗相關內容與同意參加確認。</p>' +
-                '<p>實驗目的:字形相異判斷與反應時間</p>' +
-                '<p>研究方法與程序:閱讀本頁面後，你會進入練習的部分，此部分主要是讓你熟悉實驗中會用到的反應按鍵，以及你所需要的操作。預計有五題。</p>' +
-                '<p>接著便是正式實驗，時間約為30分鐘。</p>' +
-                '<p>招募對象及條件:大學生</p>' +
-                '<p>實驗副作用:實驗不會帶來任何副作用</p>' +
-                '<p>實驗資料保存及運用:電子檔案將保留在實驗室硬碟中，實驗資料都會刪除可辨識您本人的個資後才會發布。</p>' +
-                '<p>實驗退出及中止:你可以隨時撤銷同意或中止實驗，當你決定退出時，可與本實驗室聯繫，實驗室會協助刪除你的資料。</p>' +
-                '<p>本實驗由國立台灣師範大學李俊仁老師實驗室發布</p>' +
-                '<p>若你理解、同意上述事項且同意參加，請於下一頁輸入你的姓名及今日日期當作受試者同意書。</p>' +
-                '<p>按任意鍵繼續下頁</p>' +
-                '</div>',
+      stimulus: ` 
+        <div style="text-align: justify;">
+                <p>感謝你參加本次實驗，以下是實驗相關內容與同意參加確認。</p>
+                <p>實驗目的:字形相異判斷與反應時間</p>
+                <p>研究方法與程序:閱讀本頁面後，你會進入練習的部分，此部分主要是讓你熟悉實驗中會用到的反應按鍵，以及你所需要的操作。預計有五題。</p>
+                <p>接著便是正式實驗，時間約為30分鐘。</p>
+                <p>招募對象及條件:大學生</p>
+                <p>實驗副作用:實驗不會帶來任何副作用</p>
+                <p>實驗資料保存及運用:電子檔案將保留在實驗室硬碟中，實驗資料都會刪除可辨識您本人的個資後才會發布。</p>
+                <p>實驗退出及中止:你可以隨時撤銷同意或中止實驗，當你決定退出時，可與本實驗室聯繫，實驗室會協助刪除你的資料。</p>
+                <p>本實驗由國立台灣師範大學李俊仁老師實驗室發布</p>
+                <p>若你理解、同意上述事項且同意參加，請於下一頁輸入你的姓名及今日日期當作受試者同意書。</p>
+                <p>按任意鍵繼續下頁</p>
+              </div>
+            `,
       post_trial_gap: 1000
     });
 
-    // 姓名和日期輸入
+    // Name and date input
     var nameAndDateInput = {
       type: jsPsychSurveyHtmlForm,
       preamble: '<p>請輸入您的姓名以及今日日期</p>',
-      html: '<p>本人 <input id="first" name="first" type="text" placeholder="姓名" /> 已看完上頁內容, 於 <input name="second" type="text" placeholder="日期" /> 同意參加本實驗。</p>',
+      html: ` 
+        <p>本人 <input id="first" name="first" type="text" placeholder="姓名" /> 已看完上頁內容, 於 <input name="second" type="text" placeholder="日期" /> 同意參加本實驗。</p>
+      `,
       autofocus: 'first',
       on_finish: function(data) {
         jsPsych.data.addProperties({
@@ -100,7 +93,7 @@
     };
     timeline.push(nameAndDateInput);
 
-    // 受試者編碼輸入
+    // Subject code input
     var subjectCodeInput = {
       type: jsPsychSurveyHtmlForm,
       preamble: '<p>請輸入您的受試者編碼(ID)：</p>',
@@ -119,10 +112,12 @@
 
     timeline.push({
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: '<p>螢幕上，會出現兩個韓文字母</p>' +
-                '<p>如果字母<strong>相同</strong>，請按 Z 鍵</p>' +
-                '<p>如果字母<strong>不同</strong>，請按 / 鍵</p>' +
-                '<p>按任意鍵繼續</p>',
+      stimulus: `
+        <p>螢幕上，會出現兩個韓文字母</p>
+        <p>如果字母<strong>相同</strong>，請按 Z 鍵</p>
+        <p>如果字母<strong>不同</strong>，請按 / 鍵</p>
+        <p>按任意鍵繼續</p>
+      `,
       post_trial_gap: 1000
     });
 
@@ -170,10 +165,10 @@
       stimulus: function() {
         var stim1 = jsPsych.evaluateTimelineVariable('stimulus1');
         var stim2 = jsPsych.evaluateTimelineVariable('stimulus2');
-        return '<div style="display: flex; justify-content: center; font-size: 60px;">' +
-               '<p style="margin-right: 50px;">' + stim1 + '</p>' +
-               '<p style="margin-left: 50px;">' + stim2 + '</p>' +
-               '</div>';
+        return `<div style="display: flex; justify-content: center; font-size: 60px;">
+                  <p style="margin-right: 50px;">${stim1}</p>
+                  <p style="margin-left: 50px;">${stim2}</p>
+                </div>`;
       },
       choices: ['Z', '/'],
       data: function() {
