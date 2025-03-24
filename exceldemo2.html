@@ -55,6 +55,8 @@
             .then(response => response.json())
             .then(data => console.log("Success:", data))
             .catch(error => console.error("Error:", error));
+        }
+    });
            
     var timeline = [];
 
@@ -200,6 +202,6 @@
       stimulus: '<p>按任意鍵結束實驗，感謝您的參與！</p>'
     });
 
-    jsPsych.run(timeline)
+    jsPsych.run(timeline);
   </script>
 </html>
