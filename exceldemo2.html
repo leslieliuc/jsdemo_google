@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>視覺判斷實驗</title>
     <script src="https://unpkg.com/jspsych@8.2.1"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.1.0"></script>
@@ -13,48 +13,50 @@
             color: white;
         }
     </style>
-  </head>
-  <body>
-  </body>
-  <script>
+</head>
+<body>
+</body>
+<script>
     var jsPsych = initJsPsych({
-      on_finish: function() {
-        var lastData = jsPsych.data.get().last(1).values()[0];
-        var allData = jsPsych.data.get().trials.map(trial => ({
-          subject_code: trial.subject_code || "unknown",
-          name: trial.name || "unknown",
-          date: trial.date || "unknown",
-          stimulus1: trial.stimulus1 || "",
-          stimulus2: trial.stimulus2 || "",
-          correct_response: trial.correct_response || "",
-          response: trial.response || "",
-          correct: trial.correct ? 1 : 0,
-          rt: trial.rt || 0,
-          time_elapsed: trial.time_elapsed || 0,
-        }));
+        on_finish: function() {
+            var lastData = jsPsych.data.get().last(1).values()[0];
+            var allData = jsPsych.data.get().trials.map(trial => ({
+                subject_code: trial.subject_code || "unknown",
+                name: trial.name || "unknown",
+                date: trial.date || "unknown",
+                stimulus1: trial.stimulus1 || "",
+                stimulus2: trial.stimulus2 || "",
+                correct_response: trial.correct_response || "",
+                response: trial.response || "",
+                correct: trial.correct ? 1 : 0,
+                rt: trial.rt || 0,
+                time_elapsed: trial.time_elapsed || 0,
+            }));
 
-        var correctAnswers = allData.filter(trial => trial.correct === 1).length;
-        var totalStimuli = allData.length;
-        var accuracy = (correctAnswers / totalStimuli) * 100;
+            var correctAnswers = allData.filter(trial => trial.correct === 1).length;
+            var totalStimuli = allData.length;
+            var accuracy = (correctAnswers / totalStimuli) * 100;
 
-        allData.push({
-          subject_code: lastData.subject_code || "unknown",
-          name: lastData.name || "unknown",
-          date: lastData.date || "unknown",
-          accuracy: accuracy.toFixed(2) + "%"
-        });
+            allData.push({
+                subject_code: lastData.subject_code || "unknown",
+                name: lastData.name || "unknown",
+                date: lastData.date || "unknown",
+                accuracy: accuracy.toFixed(2) + "%"
+            });
 
-        // Send data to Google Apps Script
-        var url = "https://script.google.com/macros/s/AKfycbySCYP0Kd5DZIUMhNyhgV2EknxHejji-fIqWjP9x2wwl2Uh5QfR7klQp-zlbEdEuLKN/exec";  // Replace with your Google Apps Script Web App URL
-          fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(allData),
-            mode: "cors"
-          })
+            // Send data to Google Apps Script
+            var url = "https://script.google.com/macros/s/AKfycbySCYP0Kd5DZIUMhNyhgV2EknxHejji-fIqWjP9x2wwl2Uh5QfR7klQp-zlbEdEuLKN/exec";
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(allData),
+                mode: "cors"
+            })
             .then(response => response.json())
             .then(data => console.log("Success:", data))
             .catch(error => console.error("Error:", error));
+        }
+    });
 
     var timeline = [];
 
