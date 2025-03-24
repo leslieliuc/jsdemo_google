@@ -35,7 +35,7 @@
 
             var correctAnswers = allData.filter(trial => trial.correct === 1).length;
             var totalStimuli = allData.length;
-            var accuracy = (correctAnswers / totalStimuli) * 100;
+            var accuracy = (correctAnswers / 60) * 100;
 
             allData.push({
                 subject_code: lastData.subject_code || "unknown",
